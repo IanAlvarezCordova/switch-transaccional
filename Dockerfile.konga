@@ -1,11 +1,11 @@
 FROM pantsel/konga:latest
 WORKDIR /app
 
-# 1. Instalamos el driver compatible con Postgres 12+
+# 1. Instalamos el driver nuevo
 RUN npm install --save sails-postgresql@1.0.2
 
-# 2. CIRUGÍA: Editamos el archivo culpable (/app/makedb/dbs/pg.js)
-# Buscamos la ruta larga y la cambiamos por 'pg' a secas.
-RUN sed -i "s|require('../../node_modules/sails-postgresql/node_modules/pg')|require('pg')|g" /app/makedb/dbs/pg.js
+# 2. FUERZA BRUTA: Reemplazamos la línea sin importar comillas o espacios.
+# Le decimos: "Cualquier línea que tenga 'require' y 'sails-postgresql' y 'pg', cámbiala".
+RUN sed -i 's|require(.*sails-postgresql.*pg.*)|require("pg")|g' /app/makedb/dbs/pg.js
 
 EXPOSE 1337
