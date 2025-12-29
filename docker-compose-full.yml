@@ -238,7 +238,10 @@ services:
   # 9. KONGA DASHBOARD
   # ==========================================
   konga:
-    image: revomatico/konga
+    # image: pantsel/konga  <--- BORRA O COMENTA ESTO
+    build:                  # <--- AGREGA ESTO
+      context: .            # <--- AGREGA ESTO
+      dockerfile: Dockerfile.konga # <--- AGREGA ESTO
     container_name: konga-dashboard
     restart: always
     environment:

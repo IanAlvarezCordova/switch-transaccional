@@ -1,0 +1,7 @@
+FROM pantsel/konga:latest
+# Entramos a la carpeta de la app
+WORKDIR /app
+# Instalamos la versión del driver que SÍ funciona con Postgres 12+
+RUN npm install --save sails-postgresql@1.0.2
+# Volvemos a dejar el puerto listo
+EXPOSE 1337
