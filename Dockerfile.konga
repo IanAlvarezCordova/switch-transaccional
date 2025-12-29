@@ -1,7 +1,12 @@
 FROM pantsel/konga:latest
-# Entramos a la carpeta de la app
 WORKDIR /app
-# Instalamos la versión del driver que SÍ funciona con Postgres 12+
+
+# 1. Instalamos el driver compatible
 RUN npm install --save sails-postgresql@1.0.2
-# Volvemos a dejar el puerto listo
+
+# 2. EL TRUCO: Creamos un enlace simbólico (puente) para que encuentre 'pg'
+# Esto le dice: "Si buscas 'pg' aquí dentro, ve a la carpeta principal"
+RUN mkdir -p node_modules/sails-postgresql/node_modules && \
+    ln -s ../../../pg node_modules/sails-postgresql/node_modules/pg
+
 EXPOSE 1337
