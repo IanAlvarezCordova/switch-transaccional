@@ -1,11 +1,14 @@
 FROM pantsel/konga:latest
 WORKDIR /app
 
-# 1. Instalamos el driver nuevo
+# 1. Instalamos el driver que funciona con Postgres 13
 RUN npm install --save sails-postgresql@1.0.2
 
-# 2. FUERZA BRUTA: Reemplazamos la línea sin importar comillas o espacios.
-# Le decimos: "Cualquier línea que tenga 'require' y 'sails-postgresql' y 'pg', cámbiala".
+# 2. FIX DE RUTA: Corregimos el problema de que no encuentra 'pg'
 RUN sed -i 's|require(.*sails-postgresql.*pg.*)|require("pg")|g' /app/makedb/dbs/pg.js
+
+# 3. EL HACK MAESTRO: Borramos la línea de código que se queja de la versión.
+# Buscamos en 'waterline.js' cualquier línea que diga "too new" y la borramos (d).
+RUN sed -i '/too new/d' node_modules/waterline/lib/waterline.js
 
 EXPOSE 1337
