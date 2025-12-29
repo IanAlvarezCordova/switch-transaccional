@@ -68,6 +68,12 @@ Este comando compilará los microservicios Java, configurará las redes y levant
 ```bash
 docker-compose -f docker-compose-full.yml up --build -d
 ```
+Conecta Kong:
+
+Name: Switch Kong
+
+Kong Admin URL: http://kong:8001 (Usa el nombre del contenedor).
+
 
 ---
 
