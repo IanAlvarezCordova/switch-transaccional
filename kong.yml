@@ -1,0 +1,47 @@
+_format_version: "3.0"
+services:
+  - name: switch-transaccional
+    # Aquí le decimos a Kong: "Todo lo que recibas, pásalo al contenedor ms-nucleo"
+    url: http://ms-nucleo:8082/api/v1/transacciones
+    routes:
+      - name: ruta-principal
+        # Esta será la URL pública bonita
+        paths:
+          - /api/switch/v1/transferir
+        strip_path: true
+
+plugins:
+  # 1. Seguridad: Exigir API KEY
+  - name: key-auth
+    config:
+      key_names:
+        - apikey
+
+  # 2. CORS: Permitir peticiones desde cualquier lugar
+  - name: cors
+    config:
+      origins:
+        - "*"
+      methods:
+        - POST
+        - OPTIONS
+        
+  # 4. PROMETHEUS (Métricas para monitoreo)
+  - name: prometheus
+    config: 
+      per_consumer: true # Saber qué banco consume más
+
+  # 5. FILE LOG (Auditoría: Guarda cada petición en el log del contenedor)
+  - name: file-log
+    config:
+      path: /dev/stdout # Esto hace que los logs salgan a la consola de Docker (y AWS los capture)
+
+consumers:
+  # Credenciales para tus bancos simulados
+  - username: banco-nexus
+    keyauth_credentials:
+      - key: NEXUS_SECRET_KEY_123
+
+  - username: banco-ecusol
+    keyauth_credentials:
+      - key: ECUSOL_SECRET_KEY_456
