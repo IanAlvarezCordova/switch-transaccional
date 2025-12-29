@@ -238,7 +238,7 @@ services:
   # 9. KONGA DASHBOARD
   # ==========================================
   konga:
-    image: jansmolders86/konga
+    image: revomatico/konga
     container_name: konga-dashboard
     restart: always
     environment:
