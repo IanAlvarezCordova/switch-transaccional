@@ -44,7 +44,7 @@ graph LR
 ### 1. Clonar el Repositorio Maestro
 
 ```bash
-git clone <URL_DE_ESTE_REPO> switch-orchestrator
+git clone https://github.com/IanAlvarezCordova/switch-transaccional.git switch-orchestrator
 cd switch-orchestrator
 ```
 
@@ -54,11 +54,11 @@ El código fuente de los servicios reside en sus propios repositorios. Clonarlos
 
 ```bash
 # Nombres de carpetas OBLIGATORIOS (según docker-compose.yml):
-git clone <REPO_NUCLEO> MSNucleoSwitch
-git clone <REPO_DIRECTORIO> ms-directorio
-git clone <REPO_CONTABILIDAD> Switch-ms-contabilidad
-git clone <REPO_COMPENSACION> MSCompensacionSwitch
-git clone <REPO_DEVOLUCION> MSDevolucionSwitch
+git clone https://github.com/MMoyano10/MSNucleoSwitch.git MSNucleoSwitch
+git clone https://github.com/IanAlvarezCordova/ms-directorio.git ms-directorio
+git clone https://github.com/BrayanVegaG0/Switch-ms-contabilidad.git Switch-ms-contabilidad
+git clone https://github.com/MMoyano10/MSCompensacionSwitch.git MSCompensacionSwitch
+git clone https://github.com/MMoyano10/MSDevolucionSwitch.git MSDevolucionSwitch
 ```
 
 ### 3. Levantar el Entorno
@@ -94,16 +94,16 @@ Registramos a los 4 bancos con sus URLs de Webhook.
 
 ```bash
 # 1. NEXUS
-curl -X POST http://localhost:8081/api/v1/instituciones -H "Content-Type: application/json" -d '{ "codigoBic": "NEXUS_BANK", "nombre": "Banco Nexus", "urlDestino": "http://host.docker.internal:9090/api/core/transferencias/recepcion", "llavePublica": "key_nexus", "estadoOperativo": "ONLINE" }'
+curl -X POST http://localhost:8081/api/v1/instituciones -H "Content-Type: application/json" -d '{ "codigoBic": "NEXUS_BANK", "nombre": "Nexus", "urlDestino": "http://18.225.27.253:9080/api/transacciones/webhook", "llavePublica": "NEXUS_SECRET_KEY_123", "estadoOperativo": "ONLINE" }'
 
 # 2. ECUSOL
-curl -X POST http://localhost:8081/api/v1/instituciones -H "Content-Type: application/json" -d '{ "codigoBic": "ECUSOL_BK", "nombre": "Banco Ecusol", "urlDestino": "http://host.docker.internal:9091/api/core/transferencias/recepcion", "llavePublica": "key_ecusol", "estadoOperativo": "ONLINE" }'
+curl -X POST http://localhost:8081/api/v1/instituciones -H "Content-Type: application/json" -d '{ "codigoBic": "ECUSOL_BK", "nombre": "EcuSol", "urlDestino": "http://3.20.230.110:9080/api/transacciones/webhook", "llavePublica": "PUBLIC_KEY_ECUSOL_67890", "estadoOperativo": "ONLINE" }'
 
 # 3. ARCBANK
-curl -X POST http://localhost:8081/api/v1/instituciones -H "Content-Type: application/json" -d '{ "codigoBic": "ARCBANK", "nombre": "ArcBank Global", "urlDestino": "http://host.docker.internal:9092/api/core/transferencias/recepcion", "llavePublica": "key_arc", "estadoOperativo": "ONLINE" }'
+curl -X POST http://localhost:8081/api/v1/instituciones -H "Content-Type: application/json" -d '{ "codigoBic": "ARCBANK", "nombre": "ArcBank", "urlDestino": "http://host.docker.internal:9092/api/core/transferencias/recepcion", "llavePublica": "ARCBANK_SECRET_KEY_2025_XYZ", "estadoOperativo": "ONLINE" }'
 
 # 4. BANTEC
-curl -X POST http://localhost:8081/api/v1/instituciones -H "Content-Type: application/json" -d '{ "codigoBic": "BANTEC", "nombre": "Bantec Tecnológico", "urlDestino": "http://host.docker.internal:9093/api/core/transferencias/recepcion", "llavePublica": "key_bantec", "estadoOperativo": "ONLINE" }'
+curl -X POST http://localhost:8081/api/v1/instituciones -H "Content-Type: application/json" -d '{ "codigoBic": "BANTEC", "nombre": "Bantec", "urlDestino": "http://host.docker.internal:9093/api/core/transferencias/recepcion", "llavePublica": "BANTEC_SECRET_KEY_2025", "estadoOperativo": "ONLINE" }'
 ```
 
 ### 3. Configurar Reglas de Enrutamiento / BINs (Directorio)
@@ -153,17 +153,17 @@ Para realizar una transferencia real a través del Gateway seguro.
 ```json
 {
   "header": {
-    "messageId": "MSG-TEST-001",
-    "creationDateTime": "2025-12-29T12:00:00Z",
+    "messageId": "MSG-{{$timestamp}}",
+    "creationDateTime": "{{$timestamp}}",
     "originatingBankId": "NEXUS_BANK"
   },
   "body": {
-    "instructionId": "UUID-UNICO-{{$randomInt}}", 
-    "endToEndId": "REF-CLI-XYZ",
+    "instructionId": "{{$guid}}", 
+    "endToEndId": "REF-CLI-{{$randomInt}}",
     "amount": { "currency": "USD", "value": 50.00 },
     "debtor": { "name": "Juan Perez", "accountId": "2701009999", "accountType": "CHECKING" },
     "creditor": { "name": "Maria Lopez", "accountId": "3701008888", "accountType": "SAVINGS", "targetBankId": "ECUSOL_BK" },
-    "remittanceInformation": "Pago Prueba Kong"
+    "remittanceInformation": "Pago Prueba"
   }
 }
 ```

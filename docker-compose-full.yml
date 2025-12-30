@@ -270,16 +270,16 @@ services:
       - prometheus
 
   # ==========================================
-  # 11. NGINX PROXY MANAGER (AQUÍ SÍ VA)
+  # 11. NGINX PROXY MANAGER (El Portero)
   # ==========================================
   npm:
     image: 'jc21/nginx-proxy-manager:latest'
     container_name: switch-npm
     restart: always
     ports:
-      - '80:80'
-      - '443:443'
-      - '81:81'
+      - '80:80'      # HTTP
+      - '443:443'    # HTTPS
+      - '81:81'      # Panel Admin
     environment:
       DISABLE_IPV6: 'true'
     volumes:
