@@ -168,6 +168,37 @@ Para realizar una transferencia real a través del Gateway seguro.
 }
 ```
 
+Otra prueba
+```json
+{
+  "header": {
+    "messageId": "MSG-NEX-ARC-{{$timestamp}}",
+    "creationDateTime": "2025-12-29T15:30:00Z",
+    "originatingBankId": "NEXUS_BANK"
+  },
+  "body": {
+    "instructionId": "{{$guid}}",
+    "endToEndId": "REF-COMERCIO-{{$randomInt}}",
+    "amount": {
+      "currency": "USD",
+      "value": 75.50
+    },
+    "debtor": {
+      "name": "Juan Perez",
+      "accountId": "27010012345",
+      "accountType": "CHECKING"
+    },
+    "creditor": {
+      "name": "Consultora Tech S.A.",
+      "accountId": "40000098765",
+      "accountType": "CHECKING",
+      "targetBankId": "ARCBANK"
+    },
+    "remittanceInformation": "Pago Factura Servicios"
+  }
+}
+```
+
 ---
 
 ## 📊 Monitoreo
