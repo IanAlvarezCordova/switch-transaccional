@@ -271,3 +271,24 @@ services:
 
 volumes:
   kong_data:
+  
+  # ==========================================
+  # 11. NGINX PROXY MANAGER (Gestor de Dominios y SSL)
+  # ==========================================
+  npm:
+    image: 'jc21/nginx-proxy-manager:latest'
+    container_name: switch-npm
+    restart: always
+    ports:
+      - '80:80'      # Puerto HTTP (Internet entra por aquí)
+      - '443:443'    # Puerto HTTPS (Internet seguro entra por aquí)
+      - '81:81'      # Panel de Administración (Solo para ti)
+    environment:
+      DISABLE_IPV6: 'true' # Recomendado para AWS
+    volumes:
+      - ./npm_data:/data
+      - ./npm_letsencrypt:/etc/letsencrypt
+    depends_on:
+      - kong
+    networks:
+      - default
