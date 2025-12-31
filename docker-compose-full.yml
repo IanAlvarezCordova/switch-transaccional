@@ -1,6 +1,6 @@
 services:
   # ==========================================
-  # 1. MS DIRECTORIO (Puerto 8081)
+  # 1. TUS MICROSERVICIOS (Java + Postgres)
   # ==========================================
   directorio-db:
     image: postgres:15-alpine
@@ -8,12 +8,10 @@ services:
       POSTGRES_DB: directorio_db
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: admin
-    ports:
-      - "5433:5432"
+    ports: [ "5433:5432" ]
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U postgres"]
       interval: 5s
-      timeout: 5s
       retries: 5
 
   ms-directorio:
@@ -21,8 +19,7 @@ services:
       context: ./ms-directorio
       dockerfile: Dockerfile
     container_name: ms-directorio
-    ports:
-      - "8081:8081"
+    ports: [ "8081:8081" ]
     environment:
       - SERVER_PORT=8081
       - SPRING_DATASOURCE_URL=jdbc:postgresql://directorio-db:5432/directorio_db
@@ -33,17 +30,13 @@ services:
       directorio-db:
         condition: service_healthy
 
-  # ==========================================
-  # 2. MS NÚCLEO / SWITCH (Puerto 8082)
-  # ==========================================
   nucleo-db:
     image: postgres:15-alpine
     environment:
       POSTGRES_DB: nucleo_db
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: admin
-    ports:
-      - "5434:5432"
+    ports: [ "5434:5432" ]
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U postgres"]
       interval: 5s
@@ -54,15 +47,13 @@ services:
       context: ./MSNucleoSwitch
       dockerfile: Dockerfile
     container_name: ms-nucleo
-    ports:
-      - "8082:8082"
+    ports: [ "8082:8082" ]
     environment:
       - SERVER_PORT=8082
       - SPRING_DATASOURCE_URL=jdbc:postgresql://nucleo-db:5432/nucleo_db
       - SPRING_DATASOURCE_USERNAME=postgres
       - SPRING_DATASOURCE_PASSWORD=admin
       - SPRING_JPA_HIBERNATE_DDL_AUTO=update
-      # IMPORTANTE: Así es como el Núcleo sabe a dónde llamar a los otros
       - URL_DIRECTORIO=http://ms-directorio:8081
       - URL_CONTABILIDAD=http://ms-contabilidad:8083
     depends_on:
@@ -71,17 +62,13 @@ services:
       ms-directorio:
         condition: service_started
 
-  # ==========================================
-  # 3. MS CONTABILIDAD (Puerto 8083)
-  # ==========================================
   contabilidad-db:
     image: postgres:15-alpine
     environment:
       POSTGRES_DB: contabilidad_db
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: admin
-    ports:
-      - "5435:5432"
+    ports: [ "5435:5432" ]
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U postgres"]
       interval: 5s
@@ -92,8 +79,7 @@ services:
       context: ./Switch-ms-contabilidad
       dockerfile: Dockerfile
     container_name: ms-contabilidad
-    ports:
-      - "8083:8083"
+    ports: [ "8083:8083" ]
     environment:
       - SERVER_PORT=8083
       - SPRING_DATASOURCE_URL=jdbc:postgresql://contabilidad-db:5432/contabilidad_db
@@ -104,17 +90,13 @@ services:
       contabilidad-db:
         condition: service_healthy
 
-  # ==========================================
-  # 4. MS COMPENSACIÓN (Puerto 8084)
-  # ==========================================
   compensacion-db:
     image: postgres:15-alpine
     environment:
       POSTGRES_DB: compensacion_db
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: admin
-    ports:
-      - "5436:5432"
+    ports: [ "5436:5432" ]
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U postgres"]
       interval: 5s
@@ -125,8 +107,7 @@ services:
       context: ./MSCompensacionSwitch
       dockerfile: Dockerfile
     container_name: ms-compensacion
-    ports:
-      - "8084:8084"
+    ports: [ "8084:8084" ]
     environment:
       - SERVER_PORT=8084
       - SPRING_DATASOURCE_URL=jdbc:postgresql://compensacion-db:5432/compensacion_db
@@ -137,17 +118,13 @@ services:
       compensacion-db:
         condition: service_healthy
 
-  # ==========================================
-  # 5. MS DEVOLUCIONES (Puerto 8085)
-  # ==========================================
   devolucion-db:
     image: postgres:15-alpine
     environment:
       POSTGRES_DB: devolucion
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: admin
-    ports:
-      - "5437:5432"
+    ports: [ "5437:5432" ]
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U postgres -d devolucion"]
       interval: 5s
@@ -158,8 +135,7 @@ services:
       context: ./MSDevolucionSwitch
       dockerfile: Dockerfile
     container_name: ms-devolucion
-    ports:
-      - "8085:8085"
+    ports: [ "8085:8085" ]
     environment:
       - SERVER_PORT=8085
       - SPRING_DATASOURCE_URL=jdbc:postgresql://devolucion-db:5432/devolucion
@@ -170,83 +146,41 @@ services:
       devolucion-db:
         condition: service_healthy
 
-# ==========================================
-  # 6. KONG DATABASE (El Cerebro)
   # ==========================================
-  kong-database:
-    image: postgres:13
-    container_name: kong-database
-    restart: always
-    environment:
-      POSTGRES_USER: kong
-      POSTGRES_DB: kong
-      POSTGRES_PASSWORD: kong
-    ports:
-      - "5438:5432"
-    volumes:
-      - kong_data:/var/lib/postgresql/data
-    healthcheck:
-      test: ["CMD", "pg_isready", "-U", "kong"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-
-  # ==========================================
-  # 7. KONG MIGRATION (Inicializador)
-  # ==========================================
-  kong-migration:
-    image: kong:3.4
-    container_name: kong-migration
-    command: "kong migrations bootstrap"
-    environment:
-      KONG_DATABASE: postgres
-      KONG_PG_HOST: kong-database
-      KONG_PG_USER: kong
-      KONG_PG_PASSWORD: kong
-    depends_on:
-      kong-database:
-        condition: service_healthy
-
-  # ==========================================
-  # 8. KONG API GATEWAY + MANAGER OFICIAL
+  # 6. KONG API GATEWAY (Cerebro DB-LESS)
   # ==========================================
   kong:
     image: kong:3.4
     container_name: kong-gateway
     restart: always
+    volumes:
+      - ./kong.yml:/usr/local/kong/declarative/kong.yml # Carga tu archivo
     environment:
-      KONG_DATABASE: postgres
-      KONG_PG_HOST: kong-database
-      KONG_PG_USER: kong
-      KONG_PG_PASSWORD: kong
+      KONG_DATABASE: "off"
+      KONG_DECLARATIVE_CONFIG: /usr/local/kong/declarative/kong.yml
       KONG_PROXY_ACCESS_LOG: /dev/stdout
       KONG_ADMIN_ACCESS_LOG: /dev/stdout
-      # Configuración de Puertos
-      KONG_PROXY_LISTEN: 0.0.0.0:8000, 0.0.0.0:8443 ssl
+      KONG_PROXY_LISTEN: 0.0.0.0:8000
       KONG_ADMIN_LISTEN: 0.0.0.0:8001
       
-      # --- ACTIVAR PANEL OFICIAL (Kong Manager) ---
+      # Activa el Panel Visual
       KONG_ADMIN_GUI_LISTEN: 0.0.0.0:8002
-      KONG_ADMIN_GUI_URL: http://3.140.230.212:8002  # <--- TU IP DE AWS
+      KONG_ADMIN_GUI_URL: http://switch-interbank.ddns.net:8002
       
-      # --- ACTIVAR MÉTRICAS (Prometheus) ---
+      # Activa Métricas
       KONG_PLUGINS: bundled,prometheus
       KONG_STATUS_LISTEN: 0.0.0.0:8100
-
     ports:
       - "8000:8000" # Gateway
-      - "8443:8443" # SSL
-      - "8001:8001" # API Admin
-      - "8002:8002" # PANEL VISUAL NUEVO
+      - "8001:8001" # Admin
+      - "8002:8002" # PANEL VISUAL
       - "8100:8100" # Métricas
     depends_on:
-      kong-migration:
-        condition: service_completed_successfully
       ms-nucleo:
         condition: service_started
 
   # ==========================================
-  # 9. PROMETHEUS (Recolector)
+  # 7. MONITOREO (Grafana + Prometheus)
   # ==========================================
   prometheus:
     image: prom/prometheus
@@ -256,9 +190,6 @@ services:
     ports:
       - "9090:9090"
 
-  # ==========================================
-  # 10. GRAFANA (Gráficas)
-  # ==========================================
   grafana:
     image: grafana/grafana
     container_name: switch-grafana
@@ -270,16 +201,16 @@ services:
       - prometheus
 
   # ==========================================
-  # 11. NGINX PROXY MANAGER (El Portero)
+  # 8. SEGURIDAD Y HTTPS (Nginx Proxy Manager)
   # ==========================================
   npm:
     image: 'jc21/nginx-proxy-manager:latest'
     container_name: switch-npm
     restart: always
     ports:
-      - '80:80'      # HTTP
-      - '443:443'    # HTTPS
-      - '81:81'      # Panel Admin
+      - '80:80'
+      - '443:443'
+      - '81:81'
     environment:
       DISABLE_IPV6: 'true'
     volumes:
@@ -289,9 +220,3 @@ services:
       - kong
     networks:
       - default
-
-# ==========================================
-# SECCIÓN DE VOLUMENES (AL FINAL DE TODO)
-# ==========================================
-volumes:
-  kong_data:
