@@ -92,19 +92,55 @@ curl -X POST http://localhost:8084/api/v1/compensacion/ciclos -H "Content-Type: 
 Registramos a los 4 bancos con sus URLs de Webhook.
 *(Nota: Ajustar las URLs host.docker.internal:Puertos según donde corran sus simuladores).*
 
-```bash
-# 1. NEXUS
-curl -X POST http://localhost:8081/api/v1/instituciones -H "Content-Type: application/json" -d '{ "codigoBic": "NEXUS_BANK", "nombre": "Nexus", "urlDestino": "http://18.225.27.253:9080/api/transacciones/webhook", "llavePublica": "NEXUS_SECRET_KEY_123", "estadoOperativo": "ONLINE" }'
+#NEXUS
 
-# 2. ECUSOL
-curl -X POST http://localhost:8081/api/v1/instituciones -H "Content-Type: application/json" -d '{ "codigoBic": "ECUSOL_BK", "nombre": "EcuSol", "urlDestino": "http://3.20.230.110:9080/api/transacciones/webhook", "llavePublica": "PUBLIC_KEY_ECUSOL_67890", "estadoOperativo": "ONLINE" }'
+```json
+	{
+	  "codigoBic": "NEXUS_BANK",
+	  "nombre": "Nexus",
+	  "urlDestino": "http://18.225.27.253:9080/api/transacciones/webhook",
+	  "llavePublica": "NEXUS_SECRET_KEY_123",
+	  "estadoOperativo": "ONLINE"
+	}
 
-# 3. ARCBANK
-curl -X POST http://localhost:8081/api/v1/instituciones -H "Content-Type: application/json" -d '{ "codigoBic": "ARCBANK", "nombre": "ArcBank", "urlDestino": "http://host.docker.internal:9092/api/core/transferencias/recepcion", "llavePublica": "ARCBANK_SECRET_KEY_2025_XYZ", "estadoOperativo": "ONLINE" }'
-
-# 4. BANTEC
-curl -X POST http://localhost:8081/api/v1/instituciones -H "Content-Type: application/json" -d '{ "codigoBic": "BANTEC", "nombre": "Bantec", "urlDestino": "http://host.docker.internal:9093/api/core/transferencias/recepcion", "llavePublica": "BANTEC_SECRET_KEY_2025", "estadoOperativo": "ONLINE" }'
 ```
+
+#ECUSOL
+
+```json
+	{
+	  "codigoBic": "ECUSOL_BK",
+	  "nombre": "EcuSol",
+	  "urlDestino": "http://3.20.230.110:9180/api/transacciones/webhook",
+	  "llavePublica": "PUBLIC_KEY_ECUSOL_67890",
+	  "estadoOperativo": "ONLINE"
+	}
+```
+
+#ARCBANK
+
+```json
+	{
+	  "codigoBic": "ARCBANK",
+	  "nombre": "ARCBANK",
+	  "urlDestino": "http://35.208.155.21:4080/api/core/transferencias/recepcion",
+	  "llavePublica": "ARCBANK_SECRET_KEY_2025_XYZ",
+	  "estadoOperativo": "ONLINE"
+	}
+```
+
+#BANTEC
+
+```json
+	{
+	  "codigoBic": "BANTEC",
+	  "nombre": "BANTEC",
+	  "urlDestino": "http://35.209.79.193:8082/api/core/transferencias/recepcion",
+	  "llavePublica": "BANTEC_SECRET_KEY_2025",
+	  "estadoOperativo": "ONLINE"
+	}
+```
+
 
 ### 3. Configurar Reglas de Enrutamiento / BINs (Directorio)
 Asociamos los prefijos de cuenta a cada banco.
@@ -146,7 +182,7 @@ curl -X POST http://localhost:8085/api/v1/reference/iso20022/errors -H "Content-
 
 Para realizar una transferencia real a través del Gateway seguro.
 
-*   **Ruta:** `POST http://localhost:8000/api/switch/v1/transferir`
+*   **Ruta:** `POST https://switch-interbank.ddns.net/api/v1/transacciones`
 *   **Headers:** `apikey: NEXUS_SECRET_KEY_123`
 *   **Body (ISO 20022):**
 
@@ -203,5 +239,5 @@ Otra prueba
 
 ## 📊 Monitoreo
 
-*   **Konga Dashboard:** [http://localhost:1337](http://localhost:1337) (Configurar conexión a Kong: `http://kong:8001`).
-*   **Base de Datos:** Puertos 5433-5437 expuestos para conexión local (DBeaver/PgAdmin).
+*   
+*   
