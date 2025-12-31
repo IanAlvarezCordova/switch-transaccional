@@ -1,50 +1,43 @@
 _format_version: "3.0"
 
 services:
-  # --- 1. EL NÚCLEO (Servicio Principal) ---
+  # --- EL NÚCLEO ---
   - name: switch-nucleo-service
     url: http://ms-nucleo:8082
     routes:
-      - name: ruta-transferencias
+      - name: ruta-transacciones
         paths:
-          - /api/switch/v1/transferir
+          # CAMBIO CLAVE: Usamos la ruta exacta que tu Java espera
+          - /api/v1/transacciones
+        strip_path: false  # Importante: Pasa la ruta tal cual
+        methods:
+          - POST
     plugins:
-      - name: key-auth  # Pide clave obligatoria
-      - name: prometheus # Manda datos a Grafana
-      - name: cors       # Evita errores de navegador
-
-  # --- 2. SERVICIOS SECUNDARIOS (Para el Show Visual) ---
-  # Aunque no los consumas todos por Kong, sirven para poblar el mapa
-  - name: ms-contabilidad
-    url: http://ms-contabilidad:8083
-    routes:
-      - name: admin-contabilidad
-        paths:
-          - /admin/contabilidad
-
-  - name: ms-compensacion
-    url: http://ms-compensacion:8084
-    routes:
-      - name: admin-compensacion
-        paths:
-          - /admin/compensacion
-
-  - name: ms-devolucion
-    url: http://ms-devolucion:8085
-    routes:
-      - name: admin-devolucion
-        paths:
-          - /admin/devolucion
-
-  - name: ms-directorio
-    url: http://ms-directorio:8081
-    routes:
-      - name: admin-directorio
-        paths:
-          - /admin/directorio
+      - name: key-auth
+        config:
+          key_names:
+            - apikey
+      - name: prometheus
+      - name: cors
+        config:
+          origins:
+            - "*"
+          methods:
+            - GET
+            - POST
+            - OPTIONS
+          headers:
+            - Accept
+            - Accept-Version
+            - Content-Length
+            - Content-MD5
+            - Content-Type
+            - Date
+            - X-Auth-Token
+            - apikey
 
 consumers:
-  # --- BANCOS AUTORIZADOS ---
+  # --- TUS 4 BANCOS ---
   - username: NEXUS_BANK
     keyauth_credentials:
       - key: NEXUS_SECRET_KEY_123
