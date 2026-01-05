@@ -18,7 +18,6 @@ El ecosistema se compone de 5 Microservicios (Spring Boot 3.5+) y un API Gateway
 | Servicio | Puerto Docker | Puerto Gateway (Público) | Descripción |
 | :--- | :--- | :--- | :--- |
 | **API Gateway (Kong)** | 8000 | 8000 | Punto único de entrada, Seguridad (API Key), Rate Limiting. |
-| **Dashboard (Konga)** | 1337 | 1337 | Interfaz gráfica para monitoreo del Gateway. |
 | **MS Núcleo** | 8082 | N/A | Orquestador transaccional, Idempotencia y comunicación Push. |
 | **MS Directorio** | 8081 | N/A | Registro de participantes, Reglas de Enrutamiento (BINs) y Circuit Breaker. |
 | **MS Contabilidad** | 8083 | N/A | Ledger centralizado (Cuentas Técnicas) con hash de seguridad. |
