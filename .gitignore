@@ -1,0 +1,23 @@
+# Ignorar archivos de sistema e IDEs
+.idea/
+.vscode/
+*.iml
+.DS_Store
+Thumbs.db
+*.log
+
+# IMPORTANTE: En el repo ORQUESTADOR
+# Ignoramos el CÓDIGO FUENTE de los microservicios porque van en sus propios repos.
+ms-directorio/
+MSNucleoSwitch/
+Switch-ms-contabilidad/
+MSCompensacionSwitch/
+MSDevolucionSwitch/
+switch-frontend/
+
+# Pero MANTENEMOS explícitamente los archivos de configuración de orquestación
+!kong.yml
+!docker-compose-full.yml
+!PLAN_DESPLIEGUE_AWS.md
+!PLAN_PRUEBAS_QA.md
+!AUDITORIA_FINAL.md
